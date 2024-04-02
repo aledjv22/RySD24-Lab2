@@ -167,3 +167,58 @@ En caso de *implementar* el servidor capacidad de atender *múltiples clientes s
 - Se deberá entregar código con estilo PEP8.
 - El trabajo es grupal. Todos los integrantes del grupo deberán ser capaces de explicar el código presentado.
 - No está permitido compartir código entre grupos.
+
+## RECOMENDACIONES
+El laboratorio indica que se debe utilizar la versión 3.6 de python para armar un entorno virtual, en este caso utilizaremos **[python3.6.15](https://www.python.org/downloads/release/python-3615/)**. Para hacer un buen manejo de las versiones de python se recomienda instalar **[pyenv](https://github.com/pyenv/pyenv)**. Para instalarlo se debe ejecutar los siguientes comandos:
+```bash
+sudo apt update
+sudo apt install -y make build-essential libssl-dev zlib1g-dev \
+libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
+libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git
+```
+
+```bash
+curl https://pyenv.run | bash
+```
+
+Posteriormente deben agregar las siguientes líneas al archivo `.bashrc` o `.zshrc`:
+```bash
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv virtualenv-init -)"
+```
+
+> Pueden acceder al archivo `.bashrc` o `.zshrc` con el comando `nano ~/.bashrc` o `nano ~/.zshrc`.
+
+Luego se debe cerrar y volver a abrir la terminal para seguir con los siguientes pasos:
+
+- Intalar la versión de python 3.6.15:
+  ```bash
+  pyenv install 3.6.15 # Instalar Python 3.6.15
+  ```
+- Establecer la version de python 3.6.15 como la versión local en su directorio actual:
+  ```bash
+  pyenv local 3.6.15 # Establecer Python 3.6.15 como la versión local
+  ```
+- Verificar que la versión de python sea la correcta:
+  ```bash
+  python3 --version # Debe mostrar Python 3.6.15
+  ```
+- Crear un entorno virtual con la versión de python 3.6.15:
+  ```bash
+  virtualenv -p /home/{user}/.pyenv/versions/3.6.15/bin/python3.6 .venv # Debe reemplazar {user} por su nombre de usuario
+  ```
+- Activar el entorno virtual:
+  ```bash
+  source .venv/bin/activate
+  ```
+
+Si se desea establecer una versión global (la que ya tenia u otra) debe instalar la versión de python deseada y luego establecerla como global, por ejemplo la 3.12.2
+```bash
+pyenv install 3.12.2
+pyenv global 3.12.2
+```
+
+Con eso conseguiremos que todos los directorios excepto aquellos en los que hayamos establecido una versión local, utilicen la versión global de python que hemos establecido.
+Recordar que podemos verificar la versión de python con `python3 --version`.
