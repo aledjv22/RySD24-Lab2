@@ -35,10 +35,11 @@ El servidor envía una **respuesta** a cada uno antes de procesar el siguiente h
   <tr>
     <td>get_file_listing</td>
     <td>
-      <p>Este comando recibe un comando FILENAME especificando un</p>
-      <p>nombre de archivo del cual se pretende averiguar el tamaño². El</p>
-      <p>servidor responde con una cadena indicando su valor en bytes.</p>
-      <p>Comando: get_file_listing</p>
+      <p>Este comando no recibe argumentos y busca obtener la lista de <br/>
+      archivos que están actualmente disponibles. El servidor responde <br/>
+      con una secuencia de líneas terminadas en \r\n, cada una con el <br/> 
+      nombre de uno de los archivos disponible. Una línea sin testo <br/>
+      indica el fin de la lista.</p>
       <p>Respuesta: </p>
       <ul>
         <li>0 OK\r\n</li>
