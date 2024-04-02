@@ -15,13 +15,16 @@ HFTP es un protocolo de capa de aplicación que usa TCP como protocolo de transp
 
 ### Comandos y Respuestas
 El cliente HFTP inicia el intercambio de mensajes mediante pedidos o **comandos** al servidor. 
-El servidor envía una **respuesta** a cada uno antes de procesar el siguiente hasta que el cliente envía un comando de fin de conexión. En caso de que el cliente envíe varios pedidos consecutivos, el servidor HTFP los responde en el orden en que se enviaron. El protocolo HTFP es un protocolo ASSI, no binario, por lo que lo enviado (incluso archivos binarios) será legible por humanos como stings.
+El servidor envía una **respuesta** a cada uno antes de procesar el siguiente hasta que el cliente envía un comando de fin de conexión. En caso de que el cliente envíe varios pedidos consecutivos, el servidor HTFP los responde en el orden en que se enviaron. El protocolo HTFP es un protocolo ASCII, no binario, por lo que lo enviado (incluso archivos binarios) será legible por humanos como stings.
 - **Comandos:** consisten en una cadena de caracteres compuesta por elementos separados por un único espacio y terminadas con un fin de línea estilo DOS (\r\n)¹. El primer elemento del comando define el tipo de acción esperada por el comando y los elementos que siguen son argumentos necesarios para realizar la acción.
 - **Respuestas:** comienzan con una cadena terminada en `\r\n`, y pueden tener una continuación dependiendo el comando que las origina. La cadena inicial comienza con una secuencia de dígitos (código de respuesta), seguida de un espacio, seguido de un texto describiendo el resultado de la operación. Por ejemplo, una cadena indicando un resultado exitoso tiene código 0 y con su texto descriptivo podría ser **`0 OK`**.
 
 > ¹Ver End of Line (EOL) en  https://en.wikipedia.org/wiki/Newline:
+
 > \r = CR (Carriage Return) Usado como un carácter de una línea en Mac OS.
+
 > \n = LF (Line Feed) Usando como un carácter de nueva línea en Unix/Mac OS X.
+
 > \r\n = CR + LF Usando como un carácter de nueva línea en Windows/DOS y varios protocolos.
 
 <table>
