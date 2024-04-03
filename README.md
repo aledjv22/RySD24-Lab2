@@ -38,7 +38,7 @@ El servidor envía una **respuesta** a cada uno antes de procesar el siguiente h
       <p>Este comando no recibe argumentos y busca obtener la lista de <br/>
       archivos que están actualmente disponibles. El servidor responde <br/>
       con una secuencia de líneas terminadas en \r\n, cada una con el <br/> 
-      nombre de uno de los archivos disponible. Una línea sin testo <br/>
+      nombre de uno de los archivos disponible. Una línea sin texto <br/>
       indica el fin de la lista.</p>
       <p>Respuesta: </p>
       <ul>
@@ -91,7 +91,9 @@ El servidor envía una **respuesta** a cada uno antes de procesar el siguiente h
 </table>
 
 > ²Los nombres de archivos no deberán contener espacios, de lo contrario, el protocolo no puede diferenciar si un espacio corresponde al nombre del archivo o al comienzo de un argumento.
+
 > ³Atención que de acuerdo a la codificación [ASCII](https://es.wikipedia.org/wiki/ASCII), algunos caracteres fuera del lenguaje inglés se representan con dos Bytes. En el archivo del ejemplo, de haber usado ¡ en lugar de ! al comienzo de la frase, la respuesta hubiese sido "calor que hace hoy," (con espacio al principio en luhar de al final) ya que el caracter ¡ ocupa dos bytes.
+
 > ⁴Esta es la codificación base64 de “calor que hace hoy, ”. El sentido de utilizar base64 es que al enviar el archivo posiblemente binario, se codifica en una cadena ASCII.
 
 ### Manejo de Errores
@@ -107,6 +109,10 @@ En caso de algún error, el servidor responderá con códigos de respuestas dife
 
 Los errores con código iniciado en 1 son considerados fatales y derivan en el cierre de la conexión una vez reportados por el servidor. Los errores que inician con 2 permiten continuar con la conexión y recibir pedidos posteriores.
 
+> ⁵A difrerencia de los errores no fatales 200 y 201, este error es producto de alguna malformación crítica a criterio del implementador. Por ejemplo, un comando malintencionado, de gran longitud, podría provocar un [DoS](https://es.wikipedia.org/wiki/Ataque_de_denegaci%C3%B3n_de_servicio) o disminución de performance en el server y podría ser intervenido por un error fatal de este tipo.
+
+> ⁶Se aplica particularmente al comando `get_slice` y debe generarse cuando no se cumple la condicion `OFFSET + SIZE <= filesize`.
+
 ## Tarea
 Deberán diseñar e implementar un servidor de archivos en Python 3 que soporte **completamente** un protocolo de transferencia de archivos HFTP. El servidor debe ser robusto y tolerar comandos intencional o maliciosamente incorrectos.
 
@@ -119,9 +125,6 @@ Deberán diseñar e implementar un servidor de archivos en Python 3 que soporte 
 7. Una vez que funcione el cliente ejecutar el test para probar los casos **“no felices”**.
 8. Implementar múltiples clientes utilizando hilos.
 9. **(Punto estrella)** Implementar múltiples clientes con `poll` (https://stackoverflow.com/questions/27494629/how-can-i-use-poll-to-accept-multiple-clients-tcp-server-c https://betterprogramming.pub/how-to-poll-sockets-using-python-3e1af3b047).
-
-> ⁵A difrerencia de los errores no fatales 200 y 201, este error es producto de alguna malformación crítica a criterio del implementador. Por ejemplo, un comando malintencionado, de gran longitud, podría provocar un [DoS](https://es.wikipedia.org/wiki/Ataque_de_denegaci%C3%B3n_de_servicio) o disminución de performance en el server y podría ser intervenido por un error fatal de este tipo.
-> ⁶Se aplica particularmente al comando `get_slice` y debe generarse cuando no se cumple la condicion `OFFSET + SIZE <= filesize`.
 
 El cliente y el servidor a desarrollar prodrán estar corriendo en máquinas distintas (sobre la misma red) y el servidor será capaz de manejar varias conexiones a la vez.
 
