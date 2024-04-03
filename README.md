@@ -153,7 +153,7 @@ El servidor debe aceptar en la línea de comandos las opciones:
 ## Tarea Estrella
 En caso de *implementar* el servidor capacidad de atender *múltiples clientes simultáneamente con poll*, se otorgarán puntos extras. De acuerdo al funcionamiento del mismo y capacidad del alumno de explicar lo realizado en la evaluación oral, se podrán dar hasta 2 puntos extras en la 1er evaluación de la defensa de los laboratorios.
 
-## Requisitos de la entraga
+## Requisitos de la entrega
 - Las entregas serán a través del repositorio Git provisto por la Facultad para la Cátedra, con **fecha límite indicada en el cronograma del aula virtual**.
 - Junto con el código deberá entregar una presentación (tipo powerpoint) y un video de 10 +/-1 minutos. Les damos una estructura de base como idea, pero pueden modificarla/ampliarla.
   
