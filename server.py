@@ -6,9 +6,10 @@
 # Copyright 2008-2010 Natalia Bidart y Daniel Moisset
 # $Id: server.py 656 2013-03-18 23:49:11Z bc $
 
+import connection
 import optparse
 import socket
-import connection
+import sys
 from constants import *
 
 
