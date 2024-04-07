@@ -34,6 +34,20 @@ class Connection(object):
         # Cerrar el socket
         self.socket.close()
 
+    def send(self, message: bytes | str, codif="ascii"):
+        if codif == "b64encode":
+            message = b64encode(message)
+        elif codif == "ascii":
+            message = message + EOL
+            message = message.encode("ascii")
+        else:
+            raise ValueError(f"Codificación no válida: {codif}")
+        
+        while len(message) > 0:
+            sent = self.socket.send(message)
+            assert sent > 0
+            message = message[sent:]
+
     def handle(self):
         """
         Atiende eventos de la conexión hasta que termina.
