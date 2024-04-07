@@ -76,4 +76,9 @@ class Connection(object):
         """
         Atiende eventos de la conexión hasta que termina.
         """
-        pass
+        while self.connected:
+            # Recibir datos del cliente
+            data = self.socket.recv(1024).decode("ascii").strip()
+            # Si el comando es 'quit', llamar a la función quit()
+            if data.lower() == "quit":
+                self.quit()
