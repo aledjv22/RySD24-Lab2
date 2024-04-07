@@ -40,6 +40,14 @@ class Server(object):
             pass
             # FALTA: Aceptar una conexión al server, crear una
             # Connection para la conexión y atenderla hasta que termine.
+            # Aceptar una nueva conexión
+            (clientsocket, address) = self.sock.accept()
+            # Crear una nueva instancia de Connection para manejar la comunicación con el cliente
+            conn = connection.Connection(clientsocket, self.directory)
+            # Imprimir información sobre la conexión aceptada
+            print(f"Connected by: {address}")
+            # Manejar la comunicación con el cliente
+            conn.handle()
 
 
 def main():
