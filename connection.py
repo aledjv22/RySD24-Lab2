@@ -16,6 +16,10 @@ class Connection(object):
 
     def __init__(self, socket, directory):
         # FALTA: Inicializar atributos de Connection
+        # Asignar la ruta del directorio que se está sirviendo a self.directory
+        self.directory = directory
+        # Asignar el socket del cliente a self.socket
+        self.socket = socket
         pass
 
     def handle(self):
