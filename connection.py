@@ -72,6 +72,18 @@ class Connection(object):
         # Cerramos la conexión con el cliente.
         self.close()
 
+    def get_file_listing(self):
+        """
+        Devuelve un listado de los archivos en el directorio que se está sirviendo.
+        """
+        # Inicializamos la lista de archivos.
+        files = ""
+        # Iteramos sobre los archivos en el directorio.
+        for file in os.listdir(self.directory):
+            files += file + EOL
+        self.send(str(files))
+        self.send("Test de respuesta")
+
     def handle(self):
         """
         Atiende eventos de la conexión hasta que termina.
@@ -82,3 +94,6 @@ class Connection(object):
             # Si el comando es 'quit', llamar a la función quit()
             if data.lower() == "quit":
                 self.quit()
+            # Si el comando es 'get_file_listing', llamar a la función get_file_listing()
+            elif data.lower() == "get_file_listing":
+                self.get_file_listing()
