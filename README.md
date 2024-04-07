@@ -98,6 +98,7 @@ El servidor envía una **respuesta** a cada uno antes de procesar el siguiente h
 
 ### Manejo de Errores
 En caso de algún error, el servidor responderá con códigos de respuestas diferentes a 0, más algún texto descriptivo a definir por el implementador. En particular:
+
 - 0	La operación se realizó con éxito.
 - 100	Se encontró un carácter \n fuera de un terminador de pedido \r\n.
 - 101	Alguna malformación del pedido impidió procesarlo⁵.
