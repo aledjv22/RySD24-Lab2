@@ -8,6 +8,7 @@
 
 import connection
 import optparse
+import os
 import socket
 import sys
 from constants import *
@@ -22,8 +23,10 @@ class Server(object):
     def __init__(self, addr=DEFAULT_ADDR, port=DEFAULT_PORT,
                  directory=DEFAULT_DIR):
         print("Serving %s on %s:%s." % (directory, addr, port))
-        # FALTA: Crear socket del servidor, configurarlo, asignarlo
-        # a una dirección y puerto, etc.
+        # Chequear que el directorio existe
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
+        
         # Crear un nuevo socket TCP/IP
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Vincular el socket a la dirección y puerto especificados
@@ -39,9 +42,6 @@ class Server(object):
         # Pone el socket en modo de escucha. Esto permite que el servidor acepte conexiones entrantes.
         self.sock.listen()
         while True:
-            pass
-            # FALTA: Aceptar una conexión al server, crear una
-            # Connection para la conexión y atenderla hasta que termine.
             # Aceptar una nueva conexión
             (clientsocket, address) = self.sock.accept()
             # Crear una nueva instancia de Connection para manejar la comunicación con el cliente
