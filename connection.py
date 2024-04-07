@@ -63,6 +63,15 @@ class Connection(object):
             # Actualizamos el mensaje quitando los bytes que ya se han enviado.
             message = message[sent:]
 
+    def quit(self):
+        """
+        Cierra la conexión con el cliente y envía un mensaje de despedida.
+        """
+        # Enviamos un mensaje de despedida al cliente.
+        self.send("BYE")
+        # Cerramos la conexión con el cliente.
+        self.close()
+
     def handle(self):
         """
         Atiende eventos de la conexión hasta que termina.
