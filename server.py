@@ -24,6 +24,12 @@ class Server(object):
         print("Serving %s on %s:%s." % (directory, addr, port))
         # FALTA: Crear socket del servidor, configurarlo, asignarlo
         # a una dirección y puerto, etc.
+        # Crear un nuevo socket TCP/IP
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Vincular el socket a la dirección y puerto especificados
+        self.sock.bind((addr, port))
+        # Guardar el directorio que se va a servir
+        self.directory = directory
 
     def serve(self):
         """
