@@ -36,6 +36,8 @@ class Server(object):
         Loop principal del servidor. Se acepta una conexión a la vez
         y se espera a que concluya antes de seguir.
         """
+        # Pone el socket en modo de escucha. Esto permite que el servidor acepte conexiones entrantes.
+        self.sock.listen()
         while True:
             pass
             # FALTA: Aceptar una conexión al server, crear una
