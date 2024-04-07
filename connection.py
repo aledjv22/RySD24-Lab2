@@ -5,8 +5,9 @@
 
 import os
 import socket
-from constants import *
 from base64 import b64encode
+from constants import *
+from typing import Union
 
 class Connection(object):
     """
@@ -34,18 +35,32 @@ class Connection(object):
         # Cerrar el socket
         self.socket.close()
 
-    def send(self, message: bytes | str, codif="ascii"):
+    def send(self, message: Union[bytes, str], codif="ascii"):
+        """
+        Este método se encarga de enviar un mensaje al cliente a través del socket.
+        El mensaje puede ser de tipo bytes o str, y se puede codificar como 'ascii' o 'b64encode'.
+
+        Parámetros:
+        message: El mensaje a enviar. Puede ser de tipo bytes o str.
+        codif: La codificación a utilizar para el mensaje. Por defecto es 'ascii'.
+        """
+        # Si la codificación es 'b64encode', codificamos el mensaje con base64.
         if codif == "b64encode":
             message = b64encode(message)
+        # Si la codificación es 'ascii', añadimos un fin de línea al mensaje y lo codificamos en 'ascii'.
         elif codif == "ascii":
             message = message + EOL
             message = message.encode("ascii")
+        # Si la codificación no es ninguna de las anteriores, lanzamos un error.
         else:
             raise ValueError(f"Codificación no válida: {codif}")
-        
+        # Mientras el mensaje tenga contenido, seguimos enviándolo.
         while len(message) > 0:
+            # Enviamos el mensaje a través del socket y guardamos la cantidad de bytes enviados.
             sent = self.socket.send(message)
+            # Aseguramos que se haya enviado al menos un byte.
             assert sent > 0
+            # Actualizamos el mensaje quitando los bytes que ya se han enviado.
             message = message[sent:]
 
     def handle(self):
