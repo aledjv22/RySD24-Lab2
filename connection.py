@@ -3,6 +3,7 @@
 # Copyright 2014 Carlos Bederián
 # $Id: connection.py 455 2011-05-01 00:32:09Z carlos $
 
+import os
 import socket
 from constants import *
 from base64 import b64encode
@@ -14,13 +15,24 @@ class Connection(object):
     que termina la conexión.
     """
 
-    def __init__(self, socket, directory):
-        # FALTA: Inicializar atributos de Connection
+    def __init__(self, socket: socket.socket, directory):
         # Asignar la ruta del directorio que se está sirviendo a self.directory
         self.directory = directory
         # Asignar el socket del cliente a self.socket
         self.socket = socket
-        pass
+        # Asignar True a self.connected
+        self.connected = True
+        # Asignar "" a self.buffer
+        self.buffer = ""
+
+    def close(self):
+        """
+        Cierra la conexión con el cliente.
+        """
+        # Asignar False a self.connected
+        self.connected = False
+        # Cerrar el socket
+        self.socket.close()
 
     def handle(self):
         """

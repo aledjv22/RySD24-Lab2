@@ -47,7 +47,7 @@ class Server(object):
             # Crear una nueva instancia de Connection para manejar la comunicación con el cliente
             conn = connection.Connection(clientsocket, self.directory)
             # Imprimir información sobre la conexión aceptada
-            print(f"Connected by: {address}")
+            print(f"Conectado por: {address}")
             # Manejar la comunicación con el cliente
             conn.handle()
 
