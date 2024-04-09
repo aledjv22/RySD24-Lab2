@@ -92,6 +92,7 @@ class Connection(object):
         data_line: El comando recibido.
         """
         try:
+            command, *args = data_line.split(" ")
             if data_line.lower() == "quit": # .lower() para que no importe si el comando está en mayúsculas o minúsculas
                 self.quit()
             elif data_line.lower() == "get_file_listing":
