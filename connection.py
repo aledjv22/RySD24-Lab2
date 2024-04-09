@@ -106,6 +106,13 @@ class Connection(object):
                     self.get_file_listing()
                 else:
                     self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
+            
+            # get_metadata: Devuelve el tamaño de un archivo (filename) en bytes.
+            elif command.lower() == "get_metadata":
+                if len(args) == 1:
+                    self.get_metadata(args[0])
+                else:
+                    self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
 
             pass 
         except Exception:
