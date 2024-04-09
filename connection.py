@@ -142,7 +142,11 @@ class Connection(object):
             if len(data) == 0:
                 logging.info("El server interrumpió la conexión.")
                 self.connected = False
-            # tambien podriamos agregar una guarda para un maximo tamaño de bytes para evitar ataques tipo DoS
+            
+            if len(self.buffer) >= 2**32:
+                logging.warning("El buffer ha alcanzado su capacidad máxima.")
+                self.connected = False
+        
         except ConnectionResetError:
             logging.warning("No se consiguió conectar con el cliente.")
             self.connected = False
