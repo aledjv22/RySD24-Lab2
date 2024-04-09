@@ -93,14 +93,20 @@ class Connection(object):
         """
         try:
             command, *args = data_line.split(" ")
+            # quit: Cierra la conexión con el cliente.
             if command.lower() == "quit": # .lower() para que no importe si el comando está en mayúsculas o minúsculas
                 if len(args) == 0:
                     self.quit()
                 else:
                     self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
-                    
-            elif data_line.lower() == "get_file_listing":
-                self.get_file_listing()
+            
+            # get_file_listing: Devuelve un listado de los archivos en el directorio que se está sirviendo.
+            elif command.lower() == "get_file_listing":
+                if len(args) == 0:
+                    self.get_file_listing()
+                else:
+                    self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
+
             pass 
         except Exception:
             print(f"Error en el manejo de la conexión: {Exception}")
