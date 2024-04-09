@@ -93,8 +93,12 @@ class Connection(object):
         """
         try:
             command, *args = data_line.split(" ")
-            if data_line.lower() == "quit": # .lower() para que no importe si el comando está en mayúsculas o minúsculas
-                self.quit()
+            if command.lower() == "quit": # .lower() para que no importe si el comando está en mayúsculas o minúsculas
+                if len(args) == 0:
+                    self.quit()
+                else:
+                    self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
+                    
             elif data_line.lower() == "get_file_listing":
                 self.get_file_listing()
             pass 
