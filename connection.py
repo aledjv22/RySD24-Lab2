@@ -67,7 +67,6 @@ class Connection(object):
                 assert sent > 0
                 # Actualizamos el mensaje quitando los bytes que ya se han enviado.
                 message = message[sent:]
-            self.socket.send(EOL.encode("ascii")) # Enviamos un fin de línea al final del mensaje.
         except BrokenPipeError:
             logging.error("Error al enviar el mensaje: BrokenPipeError")
             self.connected = False
@@ -80,8 +79,8 @@ class Connection(object):
         Cierra la conexión con el cliente y envía un mensaje de despedida.
         """
         # Enviamos un mensaje de despedida al cliente.
-        self.send("0 OK")
-        # Cerramos la conexión con el cliente.
+        self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
+        
         self.close()
      
     def which_command(self, data_line):
@@ -159,7 +158,7 @@ class Connection(object):
         Espera datos hasta obtener una línea completa delimitada por el
         terminador del protocolo.
 
-        Devuelve la línea, eliminando el terminaodor y los espacios en blanco
+        Devuelve la línea, eliminando el terminador y los espacios en blanco
         al principio y al final.
         """
         # Mientras no haya un EOL en el buffer y la conexión esté activa.
@@ -195,7 +194,6 @@ class Connection(object):
         file_size = os.path.getsize(file_path)
         self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
         self.send(str(file_size))
-        
         #De nuevo, podriamos agregar guardas. Sobre todo para archivos vacios, mal escritos, etc (en general invalidos)  
 
     def get_slice(self, filename:str, offset: int, size: int):
