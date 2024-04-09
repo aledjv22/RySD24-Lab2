@@ -116,9 +116,12 @@ class Connection(object):
             
             # get_slice: Devuelve un slice o parte de un arhivo (filename) codificado en base64.
             elif command.lower() == "get_slice":
-                if len(args) == 3:
-                    self.get_slice(args[0], int(args[1]), int(args[2]))
-                else:
+                try:
+                    if len(args) == 3:
+                            self.get_slice(args[0], int(args[1]), int(args[2]))
+                    else:
+                        self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
+                except ValueError:
                     self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
 
             pass 
