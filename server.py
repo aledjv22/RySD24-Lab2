@@ -44,7 +44,7 @@ class Server(object):
         while True:
             # Aceptar una nueva conexión
             (clientsocket, address) = self.sock.accept()
-            # Crear una nueva instancia de Connection para manejar la comunicación con el cliente
+            # Crear una nueva instancia de Connection para manejar la comunicación con un cliente en especifico 
             conn = connection.Connection(clientsocket, self.directory)
             # Imprimir información sobre la conexión aceptada
             print(f"Conectado por: {address}")

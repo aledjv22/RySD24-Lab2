@@ -8,6 +8,8 @@ import socket
 from base64 import b64encode
 from constants import *
 from typing import Union
+#agregados extra
+import logging 
 
 class Connection(object):
     """
@@ -33,8 +35,11 @@ class Connection(object):
         # Asignar False a self.connected
         self.connected = False
         # Cerrar el socket
-        self.socket.close()
-
+        try: 
+            self.socket.close()
+        except socket.error:
+            print("Error al cerrar la conexion")
+     
     def send(self, message: Union[bytes, str], codif="ascii"):
         """
         Este método se encarga de enviar un mensaje al cliente a través del socket.
@@ -71,29 +76,94 @@ class Connection(object):
         self.send("0 OK")
         # Cerramos la conexión con el cliente.
         self.close()
+     
+    def which_command(self, data_line):
+        if data_line.lower() == "quit":
+                self.quit()
+            # Si el comando es 'get_file_listing', llamar a la función get_file_listing()
+        elif data_line.lower() == "get_file_listing":
+            self.get_file_listing()
+        # No se como funciona lower 
+        pass 
+
+    def _recv(self, timeout=None):
+        """
+        Recibe datos y acumula en el buffer interno.
+
+        Para uso privado del servidor.
+        """
+        data = self.socket.recv(4096).decode("ascii")
+        self.buffer += data 
+
+        if len(data) == 0:
+            logging.info("El server interrumpió la conexión.")
+            self.connected = False
+        # tambien podriamos agregar una guarda para un maximo tamaño de bytes para evitar ataques tipo DoS
+
+    def read_line(self, timeout=None):
+        """
+        Espera datos hasta obtener una línea completa delimitada por el
+        terminador del protocolo.
+
+        Devuelve la línea, eliminando el terminaodr y los espacios en blanco
+        al principio y al final.
+        """
+        while not EOL in self.buffer and self.connected:
+            self._recv()
+        if EOL in self.buffer:
+            response, self.buffer = self.buffer.split(EOL, 1)
+            return response.strip()
+        else:
+            self.connected = False
+            return ""
 
     def get_file_listing(self):
         """
         Devuelve un listado de los archivos en el directorio que se está sirviendo.
         """
         # Inicializamos la lista de archivos.
-        files = ""
+        response = ""
         # Iteramos sobre los archivos en el directorio.
         for file in os.listdir(self.directory):
-            files += file + EOL
-        self.send(str(files))
-        self.send("Test de respuesta")
+            response += file + EOL
+        self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
+        self.send(str(response))
+
+    def get_metadata(self, filename: str):
+        """
+        Devuelve el tamaño de un archivo (filename) en bytes 
+        """
+        file_path = os.path.join(self.directory, filename)
+        file_size = os.path.getsize(file_path)
+        self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
+        self.send(str(file_size))
+        
+        #De nuevo, podriamos agregar guardas. Sobre todo para archivos vacios, mal escritos, etc (en general invalidos)  
+
+    def get_slice(self, filename:str, offset: int, size: int):
+        """
+        Devuelve un slice o parte de un arhivo (filename) codificado en base64 
+        Esta determinado desde offset y de tamaño size (ambos en bytes)
+        """
+        file_path = os.path.join(self.directory, filename)
+        file_size = os.path.getsize(file_path)
+        if not (offset > 0 and size > 0) or offset + size > file_size: 
+            self.send(f"{BAD_OFFSET}, {error_messages[BAD_OFFSET]}")
+            # no estoy segura si es un fatal_status como para detener la conexion 
+        else:
+            with open(file_path, "rb") as fn:
+                fn.seek(offset)
+                slice = fn.read(size)
+                self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
+                self.send(slice, codif="b63encode")
 
     def handle(self):
         """
         Atiende eventos de la conexión hasta que termina.
         """
+        data_line = ""
         while self.connected:
-            # Recibir datos del cliente
-            data = self.socket.recv(1024).decode("ascii").strip()
-            # Si el comando es 'quit', llamar a la función quit()
-            if data.lower() == "quit":
-                self.quit()
-            # Si el comando es 'get_file_listing', llamar a la función get_file_listing()
-            elif data.lower() == "get_file_listing":
-                self.get_file_listing()
+            # Recibir datos del cliente siempre y cuando sea realmente un comando, se podria implementar otra guarda para hacerlo mas robusto
+            if len(data_line) > 0:
+                self.which_command(data_line)
+            data_line = self.read_line()
