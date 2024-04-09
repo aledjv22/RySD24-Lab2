@@ -135,13 +135,20 @@ class Connection(object):
 
         Para uso privado del servidor.
         """
-        data = self.socket.recv(4096).decode("ascii")
-        self.buffer += data 
+        try:
+            data = self.socket.recv(4096).decode("ascii")
+            self.buffer += data 
 
-        if len(data) == 0:
-            logging.info("El server interrumpió la conexión.")
+            if len(data) == 0:
+                logging.info("El server interrumpió la conexión.")
+                self.connected = False
+            # tambien podriamos agregar una guarda para un maximo tamaño de bytes para evitar ataques tipo DoS
+        except ConnectionResetError:
+            logging.warning("No se consiguió conectar con el cliente.")
             self.connected = False
-        # tambien podriamos agregar una guarda para un maximo tamaño de bytes para evitar ataques tipo DoS
+        except BrokenPipeError:
+            logging.warning("Error de conexión con el cliente.")
+            self.connected = False
 
     def read_line(self, timeout=None):
         """
