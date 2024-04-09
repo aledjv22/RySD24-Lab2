@@ -91,11 +91,15 @@ class Connection(object):
         Parámetros:
         data_line: El comando recibido.
         """
-        if data_line.lower() == "quit": # .lower() para que no importe si el comando está en mayúsculas o minúsculas
+        try:
+            if data_line.lower() == "quit": # .lower() para que no importe si el comando está en mayúsculas o minúsculas
                 self.quit()
-        elif data_line.lower() == "get_file_listing":
-            self.get_file_listing()
-        pass 
+            elif data_line.lower() == "get_file_listing":
+                self.get_file_listing()
+            pass 
+        except Exception:
+            print(f"Error en el manejo de la conexión: {Exception}")
+            self.send(f"{INTERNAL_ERROR} {error_messages[INTERNAL_ERROR]}")
 
     def _recv(self, timeout=None):
         """
