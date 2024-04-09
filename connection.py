@@ -8,7 +8,6 @@ import socket
 from base64 import b64encode
 from constants import *
 from typing import Union
-#agregados extra
 import logging 
 
 class Connection(object):
@@ -38,7 +37,7 @@ class Connection(object):
         try: 
             self.socket.close()
         except socket.error:
-            print("Error al cerrar la conexion")
+            print(f"Error al cerrar la conexion. {socket.error}")
      
     def send(self, message: Union[bytes, str], codif="ascii"):
         """
@@ -49,24 +48,32 @@ class Connection(object):
         message: El mensaje a enviar. Puede ser de tipo bytes o str.
         codif: La codificación a utilizar para el mensaje. Por defecto es 'ascii'.
         """
-        # Si la codificación es 'b64encode', codificamos el mensaje con base64.
-        if codif == "b64encode":
-            message = b64encode(message)
-        # Si la codificación es 'ascii', añadimos un fin de línea al mensaje y lo codificamos en 'ascii'.
-        elif codif == "ascii":
-            message = message + EOL
-            message = message.encode("ascii")
-        # Si la codificación no es ninguna de las anteriores, lanzamos un error.
-        else:
-            raise ValueError(f"Codificación no válida: {codif}")
-        # Mientras el mensaje tenga contenido, seguimos enviándolo.
-        while len(message) > 0:
-            # Enviamos el mensaje a través del socket y guardamos la cantidad de bytes enviados.
-            sent = self.socket.send(message)
-            # Aseguramos que se haya enviado al menos un byte.
-            assert sent > 0
-            # Actualizamos el mensaje quitando los bytes que ya se han enviado.
-            message = message[sent:]
+        try:
+            # Si la codificación es 'b64encode', codificamos el mensaje con base64.
+            if codif == "b64encode":
+                message = b64encode(message)
+            # Si la codificación es 'ascii', añadimos un fin de línea al mensaje y lo codificamos en 'ascii'.
+            elif codif == "ascii":
+                message = message + EOL
+                message = message.encode("ascii")
+            # Si la codificación no es ninguna de las anteriores, lanzamos un error.
+            else:
+                raise ValueError(f"Codificación no válida: {codif}")
+            # Mientras el mensaje tenga contenido, seguimos enviándolo.
+            while len(message) > 0:
+                # Enviamos el mensaje a través del socket y guardamos la cantidad de bytes enviados.
+                sent = self.socket.send(message)
+                # Aseguramos que se haya enviado al menos un byte.
+                assert sent > 0
+                # Actualizamos el mensaje quitando los bytes que ya se han enviado.
+                message = message[sent:]
+            self.socket.send(EOL.encode("ascii")) # Enviamos un fin de línea al final del mensaje.
+        except BrokenPipeError:
+            logging.error("Error al enviar el mensaje: BrokenPipeError")
+            self.connected = False
+        except ConnectionResetError:
+            logging.error("Error al enviar el mensaje: ConnectionResetError")
+            self.connected = False
 
     def quit(self):
         """
