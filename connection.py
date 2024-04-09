@@ -124,7 +124,11 @@ class Connection(object):
                 except ValueError:
                     self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
 
-            pass 
+            # corrobora que no le hayan mandado verdura en lugar de un comando
+            else:
+                self.send(f"{INVALID_COMMAND} {error_messages[INVALID_COMMAND]}")
+                self.close()
+ 
         except Exception:
             print(f"Error en el manejo de la conexión: {Exception}")
             self.send(f"{INTERNAL_ERROR} {error_messages[INTERNAL_ERROR]}")
@@ -227,3 +231,4 @@ class Connection(object):
             elif len(data_line) > 0:
                 self.which_command(data_line)
             data_line = self.read_line()
+            
