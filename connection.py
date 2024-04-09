@@ -159,16 +159,20 @@ class Connection(object):
         Espera datos hasta obtener una línea completa delimitada por el
         terminador del protocolo.
 
-        Devuelve la línea, eliminando el terminaodr y los espacios en blanco
+        Devuelve la línea, eliminando el terminaodor y los espacios en blanco
         al principio y al final.
         """
+        # Mientras no haya un EOL en el buffer y la conexión esté activa.
         while not EOL in self.buffer and self.connected:
-            self._recv()
+            self._recv() # Recibe datos y acumula en el buffer interno.
+        
+        # Si hay un EOL en el buffer, separamos la respuesta y el buffer
         if EOL in self.buffer:
-            response, self.buffer = self.buffer.split(EOL, 1)
+            response, self.buffer = self.buffer.split(EOL, 1) 
             return response.strip()
         else:
-            self.connected = False
+            # Si no hay EOL, la conexión se cierra.
+            self.connected = False 
             return ""
 
     def get_file_listing(self):
