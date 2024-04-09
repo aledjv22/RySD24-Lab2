@@ -134,7 +134,7 @@ class Connection(object):
         for file in os.listdir(self.directory):
             response += file + EOL
         self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
-        self.send(str(response))
+        self.send(response)
 
     def get_metadata(self, filename: str):
         """
@@ -169,8 +169,10 @@ class Connection(object):
         Atiende eventos de la conexión hasta que termina.
         """
         data_line = ""
+        # Mientras la conexión esté activa, esperamos comandos del cliente.
         while self.connected:
-            # Recibir datos del cliente siempre y cuando sea realmente un comando, se podria implementar otra guarda para hacerlo mas robusto
-            if len(data_line) > 0:
+            if "\n" in data_line:
+                self.send(f"{BAD_EOL} {error_messages[BAD_EOL]}")
+            elif len(data_line) > 0:
                 self.which_command(data_line)
             data_line = self.read_line()
