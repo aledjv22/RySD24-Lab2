@@ -85,12 +85,16 @@ class Connection(object):
         self.close()
      
     def which_command(self, data_line):
-        if data_line.lower() == "quit":
+        """
+        Este método se encarga de determinar qué comando se ha recibido y llamar a la función correspondiente.
+
+        Parámetros:
+        data_line: El comando recibido.
+        """
+        if data_line.lower() == "quit": # .lower() para que no importe si el comando está en mayúsculas o minúsculas
                 self.quit()
-            # Si el comando es 'get_file_listing', llamar a la función get_file_listing()
         elif data_line.lower() == "get_file_listing":
             self.get_file_listing()
-        # No se como funciona lower 
         pass 
 
     def _recv(self, timeout=None):
