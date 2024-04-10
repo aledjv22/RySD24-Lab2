@@ -126,7 +126,6 @@ class Connection(object):
             # corrobora que no le hayan mandado verdura en lugar de un comando
             else:
                 self.send(f"{INVALID_COMMAND} {error_messages[INVALID_COMMAND]}")
-                self.close()
  
         except Exception:
             print(f"Error en el manejo de la conexión: {Exception}")
