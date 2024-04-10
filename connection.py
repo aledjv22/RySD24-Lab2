@@ -194,9 +194,12 @@ class Connection(object):
         Devuelve el tamaño de un archivo (filename) en bytes 
         """
         file_path = os.path.join(self.directory, filename)
-        file_size = os.path.getsize(file_path)
-        self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
-        self.send(str(file_size))
+        if (not os.path.isfile(file_path)):
+            self.send(f"{FILE_NOT_FOUND} {error_messages[FILE_NOT_FOUND]}")
+        else:
+            file_size = os.path.getsize(file_path)
+            self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
+            self.send(str(file_size))
         #De nuevo, podriamos agregar guardas. Sobre todo para archivos vacios, mal escritos, etc (en general invalidos)  
 
     def get_slice(self, filename:str, offset: int, size: int):
@@ -206,16 +209,18 @@ class Connection(object):
         """
         file_path = os.path.join(self.directory, filename)
         file_size = os.path.getsize(file_path)
-        if not (offset > 0 and size > 0) or offset + size > file_size: 
+        if (offset < 0 and size < 0) or offset + size > file_size: 
             self.send(f"{BAD_OFFSET}, {error_messages[BAD_OFFSET]}")
             # no estoy segura si es un fatal_status como para detener la conexion 
         else:
+            self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
             with open(file_path, "rb") as fn:
                 fn.seek(offset)
-                slice = fn.read(size)
-                self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
-                self.send(slice, codif="b63encode")
-
+                while size > 0:
+                    slice = fn.read(size)
+                    size = size - len(slice)
+                    self.send(slice, codif="b64encode")
+                self.send('')
     def handle(self):
         """
         Atiende eventos de la conexión hasta que termina.
