@@ -64,7 +64,7 @@ class Connection(object):
                 assert sent > 0
                 message = message[sent:]
         
-        except BrokenPipeError:extremo.
+        except BrokenPipeError:
             logging.error("Error al enviar el mensaje: BrokenPipeError")
             self.connected = False
 
