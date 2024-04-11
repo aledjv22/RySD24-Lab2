@@ -22,43 +22,43 @@ class Server(object):
 
     def __init__(self, addr=DEFAULT_ADDR, port=DEFAULT_PORT,
                  directory=DEFAULT_DIR):
+        """
+        Inicializa el servidor con la dirección, puerto y directorio
+        especificados.
+
+        Parámetros:
+          - addr: dirección donde escuchar por conexiones entrantes.
+          - port: puerto donde escuchar por conexiones entrantes.
+          - directory: directorio donde guardar los archivos recibidos.   
+        """
         print("Serving %s on %s:%s." % (directory, addr, port))
-        # Chequear que el directorio existe
         if not os.path.isdir(directory):
             os.mkdir(directory)
-        
-        # Crear un nuevo socket TCP/IP
+
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # Vincular el socket a la dirección y puerto especificados
         self.sock.bind((addr, port))
-        # Guardar el directorio que se va a servir
         self.directory = directory
 
     def serve(self):
         """
-        Loop principal del servidor. Se acepta una conexión a la vez
-        y se espera a que concluya antes de seguir.
+        Pone a escuchar al servidor por conexiones entrantes y lanza un hilo
+        para atender a cada una de ellas.
         """
-        # Pone el socket en modo de escucha. Esto permite que el servidor acepte conexiones entrantes.
         self.sock.listen()
         while True:
-            # Aceptar una nueva conexión
             (clientsocket, address) = self.sock.accept()
-            # Crear una nueva instancia de Connection para manejar la comunicación con un cliente en especifico 
             conn = connection.Connection(clientsocket, self.directory)
-            # Imprimir información sobre la conexión aceptada
             print(f"Conectado por: {address}")
-            # Manejar la comunicación con el cliente en diferentes hilos
-            #conn.handle()
+            # Se crea un hilo para atender la conexión
             t = threading.Thread(target=conn.handle)
-            t.start()
-
-            #INVESTIGAR SOBRE  "límite de puertos efímeros" o el "número máximo de sockets de red" para ver el maximo de clientes que puede manejar el servidor         
+            t.start() # Se inicia el hilo  
 
 
 def main():
-    """Parsea los argumentos y lanza el server"""
-
+    """
+    Función principal que parsea los argumentos de línea de comandos y
+    lanza el servidor.
+    """
     parser = optparse.OptionParser()
     parser.add_option(
         "-p", "--port",
@@ -74,8 +74,10 @@ def main():
     if len(args) > 0:
         parser.print_help()
         sys.exit(1)
+    
     try:
         port = int(options.port)
+
     except ValueError:
         sys.stderr.write(
             "Numero de puerto invalido: %s\n" % repr(options.port))
