@@ -12,7 +12,7 @@ import os
 import socket
 import sys
 from constants import *
-
+import threading
 
 class Server(object):
     """
@@ -48,8 +48,12 @@ class Server(object):
             conn = connection.Connection(clientsocket, self.directory)
             # Imprimir información sobre la conexión aceptada
             print(f"Conectado por: {address}")
-            # Manejar la comunicación con el cliente
-            conn.handle()
+            # Manejar la comunicación con el cliente en diferentes hilos
+            #conn.handle()
+            t = threading.Thread(target=conn.handle)
+            t.start()
+
+            #INVESTIGAR SOBRE  "límite de puertos efímeros" o el "número máximo de sockets de red" para ver el maximo de clientes que puede manejar el servidor         
 
 
 def main():

@@ -31,6 +31,8 @@ class Connection(object):
         """
         Cierra la conexión con el cliente.
         """
+        #Aviso
+        print("Cerrando conexion...")
         # Asignar False a self.connected
         self.connected = False
         # Cerrar el socket
@@ -182,6 +184,7 @@ class Connection(object):
         Devuelve un listado de los archivos en el directorio que se está sirviendo.
         """
         # Inicializamos la lista de archivos.
+        print("Request: get_file_listing")
         response = ""
         # Iteramos sobre los archivos en el directorio.
         for file in os.listdir(self.directory):
@@ -193,6 +196,7 @@ class Connection(object):
         """
         Devuelve el tamaño de un archivo (filename) en bytes 
         """
+        print("Request: get_metadata")
         file_path = os.path.join(self.directory, filename)
         if (not os.path.isfile(file_path)):
             self.send(f"{FILE_NOT_FOUND} {error_messages[FILE_NOT_FOUND]}")
@@ -207,6 +211,7 @@ class Connection(object):
         Devuelve un slice o parte de un arhivo (filename) codificado en base64 
         Esta determinado desde offset y de tamaño size (ambos en bytes)
         """
+        print("Request: get_slice")
         file_path = os.path.join(self.directory, filename)
         file_size = os.path.getsize(file_path)
         if (offset < 0 and size < 0) or offset + size > file_size: 
@@ -221,6 +226,7 @@ class Connection(object):
                     size = size - len(slice)
                     self.send(slice, codif="b64encode")
                 self.send('')
+
     def handle(self):
         """
         Atiende eventos de la conexión hasta que termina.
