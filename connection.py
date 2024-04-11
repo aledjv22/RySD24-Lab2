@@ -195,7 +195,11 @@ class Connection(object):
 
     def get_metadata(self, filename: str):
         """
-        Devuelve el tamaño de un archivo (filename) en bytes 
+        Devuelve el tamaño de un archivo (filename) en bytes.
+        
+        Parámetros:
+          - self: La instancia de la clase Connection.
+          - filename: El nombre del archivo del que se quiere obtener la metadata.
         """
         print("Request: get_metadata")
         file_path = os.path.join(self.directory, filename)
@@ -205,38 +209,50 @@ class Connection(object):
             file_size = os.path.getsize(file_path)
             self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
             self.send(str(file_size))
-        #De nuevo, podriamos agregar guardas. Sobre todo para archivos vacios, mal escritos, etc (en general invalidos)  
+
 
     def get_slice(self, filename:str, offset: int, size: int):
         """
-        Devuelve un slice o parte de un arhivo (filename) codificado en base64 
-        Esta determinado desde offset y de tamaño size (ambos en bytes)
+        Devuelve un slice del archivo especificado por filename, comenzando en el offset
+        y con un tamaño size.
+
+        Parámetros:
+          - self: La instancia de la clase Connection.
+          - filename: El nombre del archivo del que se quiere obtener el slice.
+          - offset: La posición inicial del slice.
+          - size: El tamaño del slice.
         """
         print("Request: get_slice")
         file_path = os.path.join(self.directory, filename)
         file_size = os.path.getsize(file_path)
         if (offset < 0 and size < 0) or offset + size > file_size: 
             self.send(f"{BAD_OFFSET}, {error_messages[BAD_OFFSET]}")
-            # no estoy segura si es un fatal_status como para detener la conexion 
+
         else:
             self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
             with open(file_path, "rb") as fn:
                 fn.seek(offset)
+
                 while size > 0:
                     slice = fn.read(size)
                     size = size - len(slice)
                     self.send(slice, codif="b64encode")
                 self.send('')
 
+
     def handle(self):
         """
-        Atiende eventos de la conexión hasta que termina.
+        Maneja la conexión con el cliente, esperando comandos y respondiendo a los mismos.
+
+        Parámetros:
+          - self: La instancia de la clase Connection.
         """
         data_line = ""
-        # Mientras la conexión esté activa, esperamos comandos del cliente.
+    
         while self.connected:
             if "\n" in data_line:
                 self.send(f"{BAD_EOL} {error_messages[BAD_EOL]}")
+
             elif len(data_line) > 0:
                 self.which_command(data_line)
             data_line = self.read_line()
