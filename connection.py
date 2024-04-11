@@ -17,74 +17,70 @@ class Connection(object):
     que termina la conexión.
     """
 
+    # Constructor de la clase Connection. Inicializa el socket, el directorio, 
+    # establece la conexión como activa y crea un buffer vacío.
     def __init__(self, socket: socket.socket, directory):
-        # Asignar la ruta del directorio que se está sirviendo a self.directory
         self.directory = directory
-        # Asignar el socket del cliente a self.socket
         self.socket = socket
-        # Asignar True a self.connected
         self.connected = True
-        # Asignar "" a self.buffer
         self.buffer = ""
+
 
     def close(self):
         """
-        Cierra la conexión con el cliente.
+        Cierra la conexión y maneja posibles errores de cierre de socket.
         """
-        #Aviso
         print("Cerrando conexion...")
-        # Asignar False a self.connected
         self.connected = False
-        # Cerrar el socket
         try: 
             self.socket.close()
         except socket.error:
             print(f"Error al cerrar la conexion. {socket.error}")
-     
+
+
     def send(self, message: Union[bytes, str], codif="ascii"):
         """
-        Este método se encarga de enviar un mensaje al cliente a través del socket.
-        El mensaje puede ser de tipo bytes o str, y se puede codificar como 'ascii' o 'b64encode'.
+        Envía un mensaje al cliente y maneja posibles errores de conexión.
 
         Parámetros:
-        message: El mensaje a enviar. Puede ser de tipo bytes o str.
-        codif: La codificación a utilizar para el mensaje. Por defecto es 'ascii'.
+        self: La instancia de la clase Connection.
+        message: El mensaje a enviar.
+        codif: La codificación a utilizar. Por defecto, "ascii".
         """
         try:
-            # Si la codificación es 'b64encode', codificamos el mensaje con base64.
             if codif == "b64encode":
                 message = b64encode(message)
-            # Si la codificación es 'ascii', añadimos un fin de línea al mensaje y lo codificamos en 'ascii'.
+            
             elif codif == "ascii":
                 message = message + EOL
                 message = message.encode("ascii")
-            # Si la codificación no es ninguna de las anteriores, lanzamos un error.
+            
             else:
                 raise ValueError(f"Codificación no válida: {codif}")
-            # Mientras el mensaje tenga contenido, seguimos enviándolo.
+            
+            # Enviamos el mensaje al cliente mientras haya algo para enviar.
             while len(message) > 0:
-                # Enviamos el mensaje a través del socket y guardamos la cantidad de bytes enviados.
                 sent = self.socket.send(message)
-                # Aseguramos que se haya enviado al menos un byte.
                 assert sent > 0
-                # Actualizamos el mensaje quitando los bytes que ya se han enviado.
                 message = message[sent:]
-        except BrokenPipeError:
+        
+        except BrokenPipeError:extremo.
             logging.error("Error al enviar el mensaje: BrokenPipeError")
             self.connected = False
+
         except ConnectionResetError:
             logging.error("Error al enviar el mensaje: ConnectionResetError")
             self.connected = False
 
+
     def quit(self):
         """
-        Cierra la conexión con el cliente y envía un mensaje de despedida.
+        Cierra la conexión con el cliente y envía un mensaje de confirmación.
         """
-        # Enviamos un mensaje de despedida al cliente.
         self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
-        
         self.close()
-     
+
+
     def which_command(self, data_line):
         """
         Este método se encarga de determinar qué comando se ha recibido y llamar a la función correspondiente.
