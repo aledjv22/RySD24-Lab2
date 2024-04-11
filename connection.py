@@ -43,9 +43,9 @@ class Connection(object):
         Envía un mensaje al cliente y maneja posibles errores de conexión.
 
         Parámetros:
-        self: La instancia de la clase Connection.
-        message: El mensaje a enviar.
-        codif: La codificación a utilizar. Por defecto, "ascii".
+          - self: La instancia de la clase Connection.
+          - message: El mensaje a enviar.
+          - codif: La codificación a utilizar. Por defecto, "ascii".
         """
         try:
             if codif == "b64encode":
@@ -83,35 +83,32 @@ class Connection(object):
 
     def which_command(self, data_line):
         """
-        Este método se encarga de determinar qué comando se ha recibido y llamar a la función correspondiente.
+        Procesa los comandos recibidos del cliente y ejecuta la acción correspondiente.
 
         Parámetros:
-        data_line: El comando recibido.
+          - self: La instancia de la clase Connection.
+          - data_line: La línea de datos recibida del cliente.
         """
         try:
             command, *args = data_line.split(" ")
-            # quit: Cierra la conexión con el cliente.
-            if command.lower() == "quit": # .lower() para que no importe si el comando está en mayúsculas o minúsculas
+            if command.lower() == "quit": 
                 if len(args) == 0:
                     self.quit()
                 else:
                     self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
             
-            # get_file_listing: Devuelve un listado de los archivos en el directorio que se está sirviendo.
             elif command.lower() == "get_file_listing":
                 if len(args) == 0:
                     self.get_file_listing()
                 else:
                     self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
             
-            # get_metadata: Devuelve el tamaño de un archivo (filename) en bytes.
             elif command.lower() == "get_metadata":
                 if len(args) == 1:
                     self.get_metadata(args[0])
                 else:
                     self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
             
-            # get_slice: Devuelve un slice o parte de un arhivo (filename) codificado en base64.
             elif command.lower() == "get_slice":
                 try:
                     if len(args) == 3:
@@ -120,8 +117,7 @@ class Connection(object):
                         self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
                 except ValueError:
                     self.send(f"{INVALID_ARGUMENTS} {error_messages[INVALID_ARGUMENTS]}")
-
-            # corrobora que no le hayan mandado verdura en lugar de un comando
+            
             else:
                 self.send(f"{INVALID_COMMAND} {error_messages[INVALID_COMMAND]}")
  
@@ -129,11 +125,14 @@ class Connection(object):
             print(f"Error en el manejo de la conexión: {Exception}")
             self.send(f"{INTERNAL_ERROR} {error_messages[INTERNAL_ERROR]}")
 
+
     def _recv(self, timeout=None):
         """
-        Recibe datos y acumula en el buffer interno.
+        Recibe datos del cliente y los acumula en el buffer interno.
 
-        Para uso privado del servidor.
+        Parámetros:
+          - self: La instancia de la clase Connection.
+          - timeout: El tiempo máximo de espera para recibir datos.
         """
         try:
             data = self.socket.recv(4096).decode("ascii")
@@ -150,43 +149,49 @@ class Connection(object):
         except ConnectionResetError:
             logging.warning("No se consiguió conectar con el cliente.")
             self.connected = False
+
         except BrokenPipeError:
             logging.warning("Error de conexión con el cliente.")
             self.connected = False
 
+
     def read_line(self, timeout=None):
         """
-        Espera datos hasta obtener una línea completa delimitada por el
-        terminador del protocolo.
+        Espera a recibir una línea completa del cliente. Devuelve la línea, 
+        eliminando el terminador y los espacios en blanco al principio y al final.
 
-        Devuelve la línea, eliminando el terminador y los espacios en blanco
-        al principio y al final.
+        Parámetros:
+          - self: La instancia de la clase Connection.
+          - timeout: El tiempo máximo de espera para recibir datos.
         """
         # Mientras no haya un EOL en el buffer y la conexión esté activa.
         while not EOL in self.buffer and self.connected:
-            self._recv() # Recibe datos y acumula en el buffer interno.
+            self._recv()
         
-        # Si hay un EOL en el buffer, separamos la respuesta y el buffer
         if EOL in self.buffer:
             response, self.buffer = self.buffer.split(EOL, 1) 
             return response.strip()
+
         else:
-            # Si no hay EOL, la conexión se cierra.
             self.connected = False 
             return ""
 
+
     def get_file_listing(self):
         """
-        Devuelve un listado de los archivos en el directorio que se está sirviendo.
+        Devuelve una lista de los archivos en el directorio que se está sirviendo.
+
+        Parámetros:
+          - self: La instancia de la clase Connection.
         """
-        # Inicializamos la lista de archivos.
         print("Request: get_file_listing")
         response = ""
-        # Iteramos sobre los archivos en el directorio.
+
         for file in os.listdir(self.directory):
             response += file + EOL
         self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
         self.send(response)
+
 
     def get_metadata(self, filename: str):
         """
