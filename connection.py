@@ -52,7 +52,6 @@ class Connection(object):
                 message = b64encode(message)
             
             elif codif == "ascii":
-                message = message + EOL
                 message = message.encode("ascii")
             
             else:
@@ -63,7 +62,7 @@ class Connection(object):
                 sent = self.socket.send(message)
                 assert sent > 0
                 message = message[sent:]
-        
+            self.socket.send(EOL.encode("ascii"))  
         except BrokenPipeError:
             logging.error("Error al enviar el mensaje: BrokenPipeError")
             self.connected = False
@@ -227,17 +226,14 @@ class Connection(object):
         file_size = os.path.getsize(file_path)
         if (offset < 0 and size < 0) or offset + size > file_size: 
             self.send(f"{BAD_OFFSET}, {error_messages[BAD_OFFSET]}")
-
+        
         else:
-            self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
+            data_slice = ""
             with open(file_path, "rb") as fn:
                 fn.seek(offset)
-
-                while size > 0:
-                    slice = fn.read(size)
-                    size = size - len(slice)
-                    self.send(slice, codif="b64encode")
-                self.send('')
+                data_slice = fn.read(size)
+                self.send(f"{CODE_OK} {error_messages[CODE_OK]}")
+                self.send(data_slice, codif="b64encode")
 
 
     def handle(self):
